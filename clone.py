@@ -5,10 +5,10 @@ from pyrogram import Client, filters
 from pytgcalls import GroupCallFactory, GroupCall
 
 # Initialize Pyrogram client
-api_id = os.getenv("API_ID")
-api_hash = os.getenv("API_HASH")
-bot_token = os.getenv("BOT_TOKEN")
-userbot_session = os.getenv("USERBOT_SESSION")
+api_id = os.getenv("12799559")
+api_hash = os.getenv("077254e69d93d08357f25bb5f4504580")
+bot_token = os.getenv("1810353153:AAHA7t2oKrYPD3C8KqJf-ccSp6C83xGRcHA")
+userbot_session = os.getenv("BQBOHgvZWj4szIdtEZ8dpP9TZ5qiuy7p1RCHM9vw0CS6OvJCDek93_dPVBIPW67Ca00a09ymLBjPMSSBfQNJvP7zirEcxl1urD5Ztuz4syfAn8yCTLOzMrVBf5_5y4t-qwLF13aL5HEvAzAcT-jen6tILa27aBaCYaLJ-JMw7YGcT42c0Cvaw14nDmI0lh2NRlNxNXT7Q7ifSGGSL_WDQqv1MBmjYt8eGCS6zMlW3X_cXJZeHikPa4TjxA0k2j8q8MkLXwdW9Hvi4KdzPJbzQI5seyNmUtYas-7VjBEbBi4GRPAAaU_5bAw9Z0uX4URb3bsHdk4YiGn0eAcKy5xvUcuuAAAAAZuXmKgA")
 
 app = Client("music_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
