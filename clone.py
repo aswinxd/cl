@@ -3,6 +3,7 @@ import asyncio
 import youtube_dl
 from pyrogram import Client, filters
 from pytgcalls import GroupCallFactory, GroupCall
+from pytgcalls.group_call_factory import GroupCallFactory
 
 # Initialize Pyrogram client
 api_id = os.getenv("12799559")
