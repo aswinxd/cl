@@ -2,14 +2,18 @@ import os
 import asyncio
 import youtube_dl
 from pyrogram import Client, filters
-from pytgcalls import GroupCallFactory
+from pytgcalls import GroupCallFactory, GroupCall
+from pytgcalls.exceptions import GroupCallNotFound
+from dotenv import load_dotenv
 
+# Load variables from .env file
+load_dotenv()
 
 # Initialize Pyrogram client
-api_id = os.getenv("12799559")
-api_hash = os.getenv("077254e69d93d08357f25bb5f4504580")
-bot_token = os.getenv("1810353153:AAHA7t2oKrYPD3C8KqJf-ccSp6C83xGRcHA")
-userbot_session = os.getenv("BQBOHgvZWj4szIdtEZ8dpP9TZ5qiuy7p1RCHM9vw0CS6OvJCDek93_dPVBIPW67Ca00a09ymLBjPMSSBfQNJvP7zirEcxl1urD5Ztuz4syfAn8yCTLOzMrVBf5_5y4t-qwLF13aL5HEvAzAcT-jen6tILa27aBaCYaLJ-JMw7YGcT42c0Cvaw14nDmI0lh2NRlNxNXT7Q7ifSGGSL_WDQqv1MBmjYt8eGCS6zMlW3X_cXJZeHikPa4TjxA0k2j8q8MkLXwdW9Hvi4KdzPJbzQI5seyNmUtYas-7VjBEbBi4GRPAAaU_5bAw9Z0uX4URb3bsHdk4YiGn0eAcKy5xvUcuuAAAAAZuXmKgA")
+api_id = os.getenv("API_ID")
+api_hash = os.getenv("API_HASH")
+bot_token = os.getenv("BOT_TOKEN")
+userbot_session = os.getenv("USERBOT_SESSION")
 
 app = Client("music_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
@@ -75,12 +79,15 @@ async def search_youtube(song_name):
 
 # Start streaming the song
 async def start_streaming(chat_id, url):
-    group_call = group_call_factory.get_group_call()
-    await group_call.join(chat_id)
-    success = await group_call.start_audio(url, repeat=False)
-    if success:
-        return group_call
-    else:
+    try:
+        group_call = group_call_factory.get_file_group_call()
+        await group_call.join(chat_id)
+        success = await group_call.start_audio(url, repeat=False)
+        if success:
+            return group_call
+        else:
+            return None
+    except GroupCallNotFound:
         return None
 
 
