@@ -66,12 +66,16 @@ async def main():
     print("Bot started successfully!")
     await asyncio.sleep(1)  # Wait for the bot to fully connect
     await start_userbot_session()
-    await app.idle()
-
+    
+    # Run the bot infinitely
+    while True:
+        await asyncio.sleep(60)  # Sleep for 60 seconds
+        
 # Start the userbot session
 async def start_userbot_session():
     userbot = Client(name=userbot_session, api_id=api_id, api_hash=api_hash)
     await userbot.start()
+
 
 
 if __name__ == "__main__":
