@@ -2,7 +2,6 @@ import os
 import asyncio
 import youtube_dl
 from pyrogram import Client, filters
-from pytgcalls import GroupCall
 from dotenv import load_dotenv
 
 # Load variables from .env file
@@ -27,30 +26,10 @@ async def play_song(client, message):
     url = await search_youtube(song_name)
     if url:
         # Start streaming the song
-        group_call = await start_streaming(message.chat.id, url)
-        if group_call:
-            await message.reply(f"Streaming song: {song_name}")
-        else:
-            await message.reply("Failed to start streaming")
+        await start_streaming(message.chat.id, url)
+        await message.reply(f"Streaming song: {song_name}")
     else:
         await message.reply("Song not found on YouTube")
-
-
-# Command to clone the bot
-@app.on_message(filters.command("clone"))
-async def clone(client, message):
-    # Extract the token from the command arguments
-    if len(message.command) != 2:
-        await message.reply_text("Usage: /clone <token>")
-        return
-    token = message.command[1]
-
-    # Set the bot token as environment variable
-    os.environ["BOT_TOKEN"] = token
-
-    # Run initialization
-    await app.start()
-    await message.reply_text("Bot successfully cloned!")
 
 
 # Search for a song on YouTube
@@ -75,12 +54,10 @@ async def search_youtube(song_name):
 # Start streaming the song
 async def start_streaming(chat_id, url):
     try:
-        group_call = GroupCall(client=app, input_filename=url)
-        await group_call.start(chat_id)
-        return group_call
+        await app.join_chat(chat_id)
+        await app.send_audio(chat_id, audio=url)
     except Exception as e:
         print(e)
-        return None
 
 
 # Run the bot
