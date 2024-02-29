@@ -60,10 +60,9 @@ async def start_streaming(chat_id, url):
 
 # Run the bot
 async def main():
-    async with app:
-        print("Bot started successfully!")
-        await asyncio.sleep(1)  # Wait for the bot to fully connect
-        await asyncio.gather(app.idle())
+    await app.start()
+    print("Bot started successfully!")
+    await asyncio.gather(app.idle())
 
 if __name__ == "__main__":
     asyncio.run(main())
