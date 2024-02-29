@@ -16,6 +16,12 @@ userbot_session = os.getenv("USERBOT_SESSION")
 app = Client("music_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
 
+# Command to start the bot
+@app.on_message(filters.command("start"))
+async def start_command(client, message):
+    await message.reply("Hello! I'm a music bot. Use the /play command to play a song.")
+
+
 # Command to play a song
 @app.on_message(filters.command("play"))
 async def play_song(client, message):
