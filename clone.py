@@ -26,7 +26,7 @@ async def play_song(client, message):
     url = await search_youtube(song_name)
     if url:
         # Start streaming the song
-        await start_streaming(message.chat.id, url)
+        await start_streaming(app, message.chat.id, url)
         await message.reply(f"Streaming song: {song_name}")
     else:
         await message.reply("Song not found on YouTube")
