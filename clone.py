@@ -11,6 +11,7 @@ load_dotenv()
 api_id = os.getenv("API_ID")
 api_hash = os.getenv("API_HASH")
 bot_token = os.getenv("BOT_TOKEN")
+userbot_session = os.getenv("USERBOT_SESSION")
 
 app = Client("music_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
@@ -51,9 +52,10 @@ async def search_youtube(song_name):
 
 
 # Start streaming the song
-async def start_streaming(chat_id, url):
+async def start_streaming(client, chat_id, url):
     try:
-        await app.send_audio(chat_id, audio=url)
+        await client.join_chat(chat_id)
+        await client.send_audio(chat_id, audio=url)
     except Exception as e:
         print(e)
 
@@ -62,7 +64,15 @@ async def start_streaming(chat_id, url):
 async def main():
     await app.start()
     print("Bot started successfully!")
-    await asyncio.gather(app.idle())
+    await asyncio.sleep(1)  # Wait for the bot to fully connect
+    await start_userbot_session()
+    await app.idle()
+
+# Start the userbot session
+async def start_userbot_session():
+    userbot = Client(session_name=userbot_session, api_id=api_id, api_hash=api_hash)
+    await userbot.start()
+
 
 if __name__ == "__main__":
     asyncio.run(main())
