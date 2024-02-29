@@ -2,8 +2,7 @@ import os
 import asyncio
 import youtube_dl
 from pyrogram import Client, filters
-from pytgcalls import GroupCallFactory, GroupCall
-from pytgcalls.exceptions import GroupCallNotFound
+from pytgcalls import GroupCall
 from dotenv import load_dotenv
 
 # Load variables from .env file
@@ -16,10 +15,6 @@ bot_token = os.getenv("BOT_TOKEN")
 userbot_session = os.getenv("USERBOT_SESSION")
 
 app = Client("music_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
-
-
-# Initialize GroupCallFactory
-group_call_factory = GroupCallFactory(app)
 
 
 # Command to play a song
@@ -80,14 +75,11 @@ async def search_youtube(song_name):
 # Start streaming the song
 async def start_streaming(chat_id, url):
     try:
-        group_call = group_call_factory.get_file_group_call()
-        await group_call.join(chat_id)
-        success = await group_call.start_audio(url, repeat=False)
-        if success:
-            return group_call
-        else:
-            return None
-    except GroupCallNotFound:
+        group_call = GroupCall(client=app, input_filename=url)
+        await group_call.start(chat_id)
+        return group_call
+    except Exception as e:
+        print(e)
         return None
 
 
