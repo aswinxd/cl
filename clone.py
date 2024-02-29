@@ -94,6 +94,7 @@ async def start_streaming(chat_id, url):
 # Run the bot
 async def main():
     await app.start()
+    print("Bot started successfully!")
     await asyncio.sleep(1)  # Wait for the bot to fully connect
     await start_userbot_session()
     await app.idle()
