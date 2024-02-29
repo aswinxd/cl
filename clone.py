@@ -70,7 +70,7 @@ async def main():
 
 # Start the userbot session
 async def start_userbot_session():
-    userbot = Client(session_name=userbot_session, api_id=api_id, api_hash=api_hash)
+    userbot = Client(name=userbot_session, api_id=api_id, api_hash=api_hash)
     await userbot.start()
 
 
