@@ -1,89 +1,100 @@
-import os
-import asyncio
-import youtube_dl
 from pyrogram import Client, filters
+from pyrogram.types import Message
+from pyrogram.errors import PeerIdInvalid
+from py_tgcalls import PyTgCalls
 from dotenv import load_dotenv
+import os
 
-# Load variables from .env file
+# Load environment variables from .env file
 load_dotenv()
 
-# Initialize Pyrogram client
-api_id = os.getenv("API_ID")
-api_hash = os.getenv("API_HASH")
-bot_token = os.getenv("BOT_TOKEN")
-userbot_session = os.getenv("USERBOT_SESSION")
+app = Client(
+    "my_bot",
+    api_id=os.getenv("API_ID"),
+    api_hash=os.getenv("API_HASH"),
+    bot_token=os.getenv("BOT_TOKEN")
+)
 
-app = Client("music_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
+pytgcalls = PyTgCalls(app)
 
+# Dictionary to store active group calls
+active_group_calls = {}
 
-# Command to start the bot
 @app.on_message(filters.command("start"))
-async def start_command(client, message):
-    await message.reply("Hello! I'm a music bot. Use the /play command to play a song.")
+async def start(bot, update):
+    await update.reply_text("Hello! I am your Group Calls Streaming bot. Use /help to see available commands.")
 
+@app.on_message(filters.command("help"))
+async def help(bot, update):
+    help_text = """
+    Available commands:
+    /play <link>: Play audio from supported platforms.
+    /pause: Pause the currently playing track.
+    /resume: Resume the paused track.
+    /stop: Stop the current playback and leave the call.
+    """
+    await update.reply_text(help_text)
 
-# Command to play a song
 @app.on_message(filters.command("play"))
-async def play_song(client, message):
-    # Get the song name from the command
-    song_name = " ".join(message.command[1:])
-    print(f"Received command to play: {song_name}")
-    
-    # Search for the song on YouTube
-    url = await search_youtube(song_name)
-    if url:
-        print(f"URL for song '{song_name}': {url}")
-        # Start streaming the song
-        await start_streaming(app, message.chat.id, url)
-        await message.reply(f"Streaming song: {song_name}")
-    else:
-        await message.reply("Song not found on YouTube")
-
-
-# Search for a song on YouTube
-async def search_youtube(song_name):
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'quiet': True,
-        'extractaudio': True,
-        'audioformat': 'mp3',
-    }
-
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        try:
-            info = ydl.extract_info(f"ytsearch1:{song_name}", download=False)
-            if 'entries' in info:
-                return info['entries'][0]['url']
-        except Exception as e:
-            print(e)
-            return None
-
-
-# Start streaming the song
-async def start_streaming(client, chat_id, url):
+async def play(bot, update):
     try:
-        await client.join_chat(chat_id)
-        print(f"Joining chat {chat_id} for streaming")
-        await client.send_audio(chat_id, audio=url)
-        print("Streaming started successfully")
-    except Exception as e:
-        print(e)
+        # Check if the user is in a group
+        if update.chat.type != "group" and update.chat.type != "supergroup":
+            await update.reply_text("Please add me to a group to use this command.")
+            return
 
+        # Get the provided link from the message
+        link = update.command[1]
+        
+        # Check the type of link and handle accordingly (e.g., YouTube, Spotify, etc.)
+        # Stream the content using Py-Tgcalls
 
-# Run the bot
-async def main():
-    await app.start()
-    print("Bot started successfully!")
-    await asyncio.sleep(1)  # Wait for the bot to fully connect
-    await start_userbot_session()
-    await asyncio.get_event_loop().run_forever()  # Keep the event loop running
+        # For demonstration, let's just reply with the link being played
+        await update.reply_text(f"Streaming: {link}")
 
+        # Start streaming in the group call
+        chat_id = update.chat.id
+        if chat_id not in active_group_calls:
+            active_group_calls[chat_id] = pytgcalls.join_group_call(chat_id)
+        
+        # For demonstration, let's assume we're using some placeholder audio file
+        audio_file = "path_to_audio_file.mp3"
+        await active_group_calls[chat_id].start_audio(audio_file)
+        
+    except IndexError:
+        await update.reply_text("Please provide a valid link.")
 
-# Start the userbot session
-async def start_userbot_session():
-    userbot = Client(name=userbot_session, api_id=api_id, api_hash=api_hash)
-    await userbot.start()
+@app.on_message(filters.command("pause"))
+async def pause(bot, update):
+    # Pause the currently playing track in the group call
+    chat_id = update.chat.id
+    if chat_id in active_group_calls:
+        await active_group_calls[chat_id].pause_audio()
+        await update.reply_text("Track paused.")
+    else:
+        await update.reply_text("No active playback.")
 
+@app.on_message(filters.command("resume"))
+async def resume(bot, update):
+    # Resume the paused track in the group call
+    chat_id = update.chat.id
+    if chat_id in active_group_calls:
+        await active_group_calls[chat_id].resume_audio()
+        await update.reply_text("Track resumed.")
+    else:
+        await update.reply_text("No active playback.")
 
-if __name__ == "__main__":
-    asyncio.run(main())
+@app.on_message(filters.command("stop"))
+async def stop(bot, update):
+    # Stop the current playback and leave the call
+    chat_id = update.chat.id
+    if chat_id in active_group_calls:
+        await active_group_calls[chat_id].stop_audio()
+        del active_group_calls[chat_id]
+        await update.reply_text("Playback stopped.")
+    else:
+        await update.reply_text("No active playback.")
+
+# Add more handlers for other commands and functionalities
+
+app.run()
