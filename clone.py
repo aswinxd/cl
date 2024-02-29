@@ -74,6 +74,9 @@ async def start_streaming(client, chat_id, url):
 async def main():
     await app.start()
     print("Bot started successfully!")
+    await asyncio.sleep(1)  # Wait for the bot to fully connect
+    await start_userbot_session()
+    await asyncio.get_event_loop().run_forever()  # Keep the event loop running
 
 
 # Start the userbot session
