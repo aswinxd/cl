@@ -1,7 +1,7 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from pyrogram.errors import PeerIdInvalid
-from py_tgcalls import PyTgCalls
+import PyTgCalls
 from dotenv import load_dotenv
 import os
 
