@@ -1,0 +1,4 @@
+pyrogram==1.4.0
+pytgcalls==0.9.7
+youtube-dl==2022.01.01
+python-dotenv==0.19.1
