@@ -21,10 +21,12 @@ app = Client("music_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 async def play_song(client, message):
     # Get the song name from the command
     song_name = " ".join(message.command[1:])
+    print(f"Received command to play: {song_name}")
     
     # Search for the song on YouTube
     url = await search_youtube(song_name)
     if url:
+        print(f"URL for song '{song_name}': {url}")
         # Start streaming the song
         await start_streaming(app, message.chat.id, url)
         await message.reply(f"Streaming song: {song_name}")
@@ -55,7 +57,9 @@ async def search_youtube(song_name):
 async def start_streaming(client, chat_id, url):
     try:
         await client.join_chat(chat_id)
+        print(f"Joining chat {chat_id} for streaming")
         await client.send_audio(chat_id, audio=url)
+        print("Streaming started successfully")
     except Exception as e:
         print(e)
 
@@ -70,12 +74,11 @@ async def main():
     # Run the bot infinitely
     while True:
         await asyncio.sleep(60)  # Sleep for 60 seconds
-        
+
 # Start the userbot session
 async def start_userbot_session():
     userbot = Client(name=userbot_session, api_id=api_id, api_hash=api_hash)
     await userbot.start()
-
 
 
 if __name__ == "__main__":
